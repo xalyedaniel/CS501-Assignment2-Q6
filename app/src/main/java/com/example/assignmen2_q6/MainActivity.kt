@@ -5,6 +5,7 @@ import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
 import android.view.View
+import android.widget.Toast
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.assignmen2_q6.databinding.ActivityMainBinding
@@ -12,10 +13,20 @@ import com.example.assignmen2_q6.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
-    private var main_list = mutableListOf<Any>(0)
+    /*
+    this calculator only allows keyboard input for numbers, not operators
+
+    to avoid errors, once the user inputs sqrt then consecutive digits will not be recorded
+    i.e. 6, sqrt, 7 only logs 6, sqrt
+    this effect stops once an operator or equal sign is pressed
+
+     */
+
+
+    private var mainList = mutableListOf<Any>(0)
 
     private fun reset_list(){
-        main_list = mutableListOf<Any>(0)
+        mainList = mutableListOf<Any>(0)
     }
 
 
@@ -91,10 +102,11 @@ class MainActivity : AppCompatActivity() {
             }
         }
         override fun afterTextChanged(s: Editable) {
+
+
             if (!s.contains('.')){ //this covers when user backspaces and deletes a decimal
                 canAddDecimal = true
             }
-
 
             if (s.isEmpty()){
                 s.append("0")
@@ -109,6 +121,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun numberAction(view: View){
+
         if (view is Button){
             if (view.text == "."){
                 if (canAddDecimal)
@@ -129,40 +142,48 @@ class MainActivity : AppCompatActivity() {
             //binding.workspace.append(view.text)
             //more convenient if above line is omitted due to pre-existing char filters
             //also, having tested on a calculator app, operator symbols need not appear
-            if (!canAddOperation) { //this means that last element in main_list should be an operator
-                main_list[-1] = view.text
-            } else{
-                main_list.add(binding.workspace.text.toString())
-                main_list.add(view.text.toString())
-                // with the above two lines, we are assuming that we will not hit an edge case
-                // where we have to check if input is empty
-                binding.workspace.setText("")
-                canAddOperation = false
+            if (!canAddOperation) { //this means that last element in mainList should be an operator
+                mainList.removeLast()
+                mainList.add(view.text)
+            } else {
+                if (view.text == "sqrt") {
+                    canAddOperation = true
+                    holdingSqrt = true
+                    mainList.add(binding.workspace.text.toString())
+                    mainList.add(view.text.toString())
+                    binding.workspace.setText("")
+
+                } else{
+                    if (!holdingSqrt){
+                        mainList.add(binding.workspace.text.toString())
+                    }
+                    mainList.add(view.text.toString())
+                    // with the above two lines, we are assuming that we will not hit an edge case
+                    // where we have to check if input is empty
+                    binding.workspace.setText("")
+                    canAddOperation = false
+                    holdingSqrt = false
+                }
+
             }
             canAddDecimal = true
         }
     }
 
-    /*
+
     fun equalsAction(view: View) {
-        if (CanAddOperation){
-            main_list.add(binding.workspace.text.toString())
+        if (canAddOperation && !holdingSqrt){
+            mainList.add(binding.workspace.text.toString())
         }
+        holdingSqrt = false
+        canAddOperation = true
 
-        \\what happens if we get a case like
-        \\7 + 3 * 10 * =
-        \\where the very last operand is missing?
-        \\based on microsoft calculator, it seems that the expression before the last operator is solved
-        \\and the solution is copied to the right-hand side of the last operator
-        \\therfore
-        \\7 + 3 * 10 * =
-        \\is equivalent to
-        \\ 7 + 3 * 10 * (7 + 3 * 10)
+        Toast.makeText(getApplicationContext(),mainList.toString(), 5).show()
+        reset_list()
 
-
-        binding.workspace.text = calculateResults()
+        //binding.workspace.text = calculateResults()
     }
-
+    /*
     private fun calculateResults(): String
     {
         val digitsOperators = digitsOperators()
