@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
 import android.text.TextWatcher
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import android.widget.Button
@@ -47,11 +48,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        Log.i("debug","testing")
 
         binding.workspace.addTextChangedListener(decimalLookout)
         binding.workspace.filters = arrayOf(decimalFilter)
         binding.workspace.setText("0")
 
+        Log.i("debug","testing")
         binding.button1.setOnClickListener { numberAction(it) }
         binding.button2.setOnClickListener { numberAction(it) }
         binding.button3.setOnClickListener { numberAction(it) }
@@ -68,7 +71,11 @@ class MainActivity : AppCompatActivity() {
         binding.button14.setOnClickListener { operationAction(it) }
         binding.button15.setOnClickListener { numberAction(it) }
         binding.button16.setOnClickListener { numberAction(it) }
-        //binding.button17.setOnClickListener { equalsAction(it) }
+        binding.button17.setOnClickListener { equalsAction(it) }
+        Log.i("debug","testing")
+        println("i want to see this")
+        println("what place other than Logcat can i see this")
+        Log.i("complain","nothing different with print???")
 
     }
 
@@ -173,6 +180,7 @@ class MainActivity : AppCompatActivity() {
 
 
     fun equalsAction(view: View) {
+        Log.d("debug","equals")
         if (canAddOperation && !holdingSqrt){
             mainList.add(binding.workspace.text.toString())
         }
@@ -181,7 +189,7 @@ class MainActivity : AppCompatActivity() {
 
         //Toast.makeText(getApplicationContext(),mainList.toString(), Toast.LENGTH_SHORT).show()
 
-
+        Log.d("debug","calculateResults:"+calculateResults())
         binding.workspace.setText(calculateResults())
 
         reset_list()
@@ -202,14 +210,16 @@ class MainActivity : AppCompatActivity() {
         if(timesDivision.isEmpty()) return ""
 
         val result = addSubtractCalculate(timesDivision)
-
+        // TODO: result is inaccurate
         return result.toString()
     }
 
     private fun addSubtractCalculate(passedList: MutableList<Any>): Float
     {
-        var result = passedList[0] as Float
-
+        Log.d("debug","addSubtractCalculate, before cast")
+        Log.d("debug","casting ${passedList[0]} as float")
+        var result = passedList[0].toString().toFloat()
+        Log.d("debug","addSubtractCalculate, result: $result")
         for(i in passedList.indices)
         {
             if(passedList[i] is Char && i != passedList.lastIndex)
