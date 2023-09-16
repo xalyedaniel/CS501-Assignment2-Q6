@@ -3,7 +3,6 @@ package com.example.assignmen2_q6
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputFilter
-import android.text.Spanned
 import android.text.TextWatcher
 import android.view.View
 import android.widget.Button
@@ -24,40 +23,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
 
-    private var canAddOperation = false
-    private var canAddDecimal = true
+    private var canAddOperation = false //used to avoid error of consecutive operations
+    private var canAddDecimal = true //used to ensure only one decimal
 
-    private var holdingSqrt = false
+    private var holdingResult = false //used to handle use case where user calculates result and immediately operates on it
+    private var holdingSqrt = false //used to avoid error where someone can input sqrt(3)3 for example
 
-    //sourced from Java code found at https://stackoverflow.com/questions/3349121/how-do-i-use-inputfilter-to-limit-characters-in-an-edittext-in-android
-    private var decimalFilter:InputFilter =
-        InputFilter { input, start, end, dest, dstart, dend ->
-            if (!canAddDecimal and input.contains('.')){
-                ""
-            } else {
-                input
-            }
-        }
 
-    //using text watcher to be 'smart' and avoid multiple decimals when inputting a number
-    //from keyboard
-    //source: https://www.geeksforgeeks.org/how-to-implement-textwatcher-in-android/
-
-    private val decimalLookout: TextWatcher = object : TextWatcher{
-        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            if (s.isNotEmpty()){ //if s is empty, calling .last() crashes program
-                if (s.last() == '.') {
-                    canAddDecimal = false
-                }
-            }
-        }
-        override fun afterTextChanged(s: Editable) {
-            if (!s.contains('.')){ //this covers when user backspaces and deletes a decimal
-                canAddDecimal = true
-            }
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,6 +38,7 @@ class MainActivity : AppCompatActivity() {
 
         binding.workspace.addTextChangedListener(decimalLookout)
         binding.workspace.filters = arrayOf(decimalFilter)
+        binding.workspace.setText("0")
 
         binding.button1.setOnClickListener { numberAction(it) }
         binding.button2.setOnClickListener { numberAction(it) }
@@ -87,6 +60,54 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    //sourced from Java code found at https://stackoverflow.com/questions/3349121/how-do-i-use-inputfilter-to-limit-characters-in-an-edittext-in-android
+    private var decimalFilter:InputFilter =
+        InputFilter { input, start, end, dest, dstart, dend ->
+            if (!canAddDecimal and input.contains('.')){
+                ""
+            } else {
+                input
+            }
+        }
+
+
+
+    //using text watcher to be 'smart' and avoid multiple decimals when inputting a number
+    //from keyboard
+    //source: https://www.geeksforgeeks.org/how-to-implement-textwatcher-in-android/
+
+    private fun dropFirstChar(){
+        binding.workspace.text.delete(0,1)
+    }
+
+    private val decimalLookout: TextWatcher = object : TextWatcher{
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            if (s.isNotEmpty()){ //if s is empty, calling .last() crashes program
+                if (s.last() == '.') {
+                    canAddDecimal = false
+
+                }
+            }
+        }
+        override fun afterTextChanged(s: Editable) {
+            if (!s.contains('.')){ //this covers when user backspaces and deletes a decimal
+                canAddDecimal = true
+            }
+
+
+            if (s.isEmpty()){
+                s.append("0")
+            } else {
+                if (s.first() == '0' && s.length == 2 && s.last() != '.'){
+                    dropFirstChar()
+                }
+            }
+
+
+        }
+    }
+
     private fun numberAction(view: View){
         if (view is Button){
             if (view.text == "."){
@@ -101,15 +122,44 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun operationAction(view: View) {
-        if(view is Button && canAddOperation) {
-            binding.workspace.append(view.text)
-            canAddOperation = false
+        //slight alteration, as I have found that in calculator apps
+        //typing an operation then another operation (without an operand in between)
+        //overrides the last operation with the latest operation
+        if(view is Button) {
+            //binding.workspace.append(view.text)
+            //more convenient if above line is omitted due to pre-existing char filters
+            //also, having tested on a calculator app, operator symbols need not appear
+            if (!canAddOperation) { //this means that last element in main_list should be an operator
+                main_list[-1] = view.text
+            } else{
+                main_list.add(binding.workspace.text.toString())
+                main_list.add(view.text.toString())
+                // with the above two lines, we are assuming that we will not hit an edge case
+                // where we have to check if input is empty
+                binding.workspace.setText("")
+                canAddOperation = false
+            }
             canAddDecimal = true
         }
     }
 
     /*
     fun equalsAction(view: View) {
+        if (CanAddOperation){
+            main_list.add(binding.workspace.text.toString())
+        }
+
+        \\what happens if we get a case like
+        \\7 + 3 * 10 * =
+        \\where the very last operand is missing?
+        \\based on microsoft calculator, it seems that the expression before the last operator is solved
+        \\and the solution is copied to the right-hand side of the last operator
+        \\therfore
+        \\7 + 3 * 10 * =
+        \\is equivalent to
+        \\ 7 + 3 * 10 * (7 + 3 * 10)
+
+
         binding.workspace.text = calculateResults()
     }
 
