@@ -11,6 +11,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.assignmen2_q6.databinding.ActivityMainBinding
 import java.lang.Math.sqrt
+import kotlin.math.sqrt
 
 
 class MainActivity : AppCompatActivity() {
@@ -215,7 +216,21 @@ class MainActivity : AppCompatActivity() {
         /*
         check previous value if it exists and return square root of previous value
          */
-        return passedList
+        var result = passedList
+
+        while (result.contains("sqrt")){
+            val index = result.indexOf("sqrt")
+            val prev = result[index-1].toString().toFloat()
+            if (prev >= 0){
+                result = (result.slice(0..<index-1 ) + mutableListOf(sqrt(prev)) + result.slice(index+1..< result.size)).toMutableList()
+            } else {
+                Toast.makeText(getApplicationContext(), "error: negative input to square root", Toast.LENGTH_SHORT).show()
+            }
+            //Toast.makeText(getApplicationContext(), result.toString(), Toast.LENGTH_SHORT).show()
+
+        }
+
+        return result
     }
 
     private fun addSubtractCalculate(passedList: MutableList<Any>): Float
