@@ -219,6 +219,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun sqrtCalculate(passedList: MutableList<Any>): MutableList<Any>{
+        /*
+        check previous value if it exists and return square root of previous value
+         */
         return passedList
     }
 
@@ -284,11 +287,6 @@ class MainActivity : AppCompatActivity() {
                         val nextDigit = passedList[i + 1] as Double
                         //remember to add division by zero error here
                         newList.add(prevDigit / nextDigit)
-                        restartIndex = i + 1
-                    }
-                    "sqrt" ->
-                    {
-                        newList.add(sqrt(prevDigit))
                         restartIndex = i + 1
                     }
                     else ->
