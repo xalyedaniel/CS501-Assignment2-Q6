@@ -204,14 +204,22 @@ class MainActivity : AppCompatActivity() {
         val digitsOperators = mainList
         //Toast.makeText(getApplicationContext(),mainList.toString(), Toast.LENGTH_SHORT).show()
 
+
         if(digitsOperators.isEmpty()) return ""
 
-        val timesDivision = timesDivisionCalculate(digitsOperators)
+        val sqrt = sqrtCalculate(digitsOperators)
+        if (sqrt.isEmpty()) return ""
+
+        val timesDivision = timesDivisionCalculate(sqrt)
         if(timesDivision.isEmpty()) return ""
 
         val result = addSubtractCalculate(timesDivision)
         // TODO: result is inaccurate
         return result.toString()
+    }
+
+    private fun sqrtCalculate(passedList: MutableList<Any>): MutableList<Any>{
+        return passedList
     }
 
     private fun addSubtractCalculate(passedList: MutableList<Any>): Float
