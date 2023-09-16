@@ -9,6 +9,7 @@ import android.widget.Toast
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.assignmen2_q6.databinding.ActivityMainBinding
+import java.lang.Math.sqrt
 
 
 class MainActivity : AppCompatActivity() {
@@ -23,10 +24,10 @@ class MainActivity : AppCompatActivity() {
      */
 
 
-    private var mainList = mutableListOf<Any>(0)
+    private var mainList = mutableListOf<Any>()
 
     private fun reset_list(){
-        mainList = mutableListOf<Any>(0)
+        mainList = mutableListOf<Any>()
     }
 
 
@@ -178,21 +179,30 @@ class MainActivity : AppCompatActivity() {
         holdingSqrt = false
         canAddOperation = true
 
-        Toast.makeText(getApplicationContext(),mainList.toString(), 5).show()
-        reset_list()
+        //Toast.makeText(getApplicationContext(),mainList.toString(), Toast.LENGTH_SHORT).show()
 
-        //binding.workspace.text = calculateResults()
+
+        binding.workspace.setText(calculateResults())
+
+        reset_list()
     }
-    /*
+
+
+
+
     private fun calculateResults(): String
     {
-        val digitsOperators = digitsOperators()
+        //val digitsOperators = digitsOperators()
+        val digitsOperators = mainList
+        //Toast.makeText(getApplicationContext(),mainList.toString(), Toast.LENGTH_SHORT).show()
+
         if(digitsOperators.isEmpty()) return ""
 
         val timesDivision = timesDivisionCalculate(digitsOperators)
         if(timesDivision.isEmpty()) return ""
 
         val result = addSubtractCalculate(timesDivision)
+
         return result.toString()
     }
 
@@ -219,10 +229,14 @@ class MainActivity : AppCompatActivity() {
     private fun timesDivisionCalculate(passedList: MutableList<Any>): MutableList<Any>
     {
         var list = passedList
-        while (list.contains('x') || list.contains('/'))
-        {
+        //Toast.makeText(getApplicationContext(), passedList.toString(), Toast.LENGTH_SHORT).show()
+        while (list.contains('*') || list.contains('/')) {
+            Toast.makeText(getApplicationContext(), "testing", Toast.LENGTH_SHORT).show()
             list = calcTimesDiv(list)
         }
+
+
+
         return list
     }
 
@@ -236,23 +250,27 @@ class MainActivity : AppCompatActivity() {
             if((passedList[i] is Char || passedList[i] =="sqrt") && i != passedList.lastIndex && i < restartIndex)
             {
                 val operator = passedList[i]
-                val prevDigit = passedList[i - 1] as Float
-                val nextDigit = passedList[i + 1] as Float
+                val prevDigit = passedList[i - 1] as Double
+
                 when(operator)
                 {
                     '*' ->
                     {
+
+                        val nextDigit = passedList[i + 1] as Double
                         newList.add(prevDigit * nextDigit)
                         restartIndex = i + 1
                     }
                     '/' ->
                     {
+                        val nextDigit = passedList[i + 1] as Double
+                        //remember to add division by zero error here
                         newList.add(prevDigit / nextDigit)
                         restartIndex = i + 1
                     }
                     "sqrt" ->
                     {
-                        //not done yet
+                        newList.add(sqrt(prevDigit))
                         restartIndex = i + 1
                     }
                     else ->
@@ -266,9 +284,12 @@ class MainActivity : AppCompatActivity() {
             if(i > restartIndex)
                 newList.add(passedList[i])
         }
-
+        //Toast.makeText(getApplicationContext(), newList.toString(), Toast.LENGTH_SHORT).show()
         return newList
     }
+
+    /*
+    //not using this particular function anymore
 
     private fun digitsOperators(): MutableList<Any>
     {
@@ -292,4 +313,6 @@ class MainActivity : AppCompatActivity() {
         return list
     }
     */
+
+
 }
