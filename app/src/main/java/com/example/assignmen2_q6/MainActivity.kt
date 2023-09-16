@@ -101,19 +101,12 @@ class MainActivity : AppCompatActivity() {
 
     private val decimalLookout: TextWatcher = object : TextWatcher{
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            if (s.isNotEmpty()){ //if s is empty, calling .last() crashes program
-                if (s.last() == '.') {
-                    canAddDecimal = false
-
-                }
-            }
-        }
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         override fun afterTextChanged(s: Editable) {
-
-
             if (!s.contains('.')){ //this covers when user backspaces and deletes a decimal
                 canAddDecimal = true
+            } else {
+                canAddDecimal = false
             }
 
             if (s.isEmpty()){
