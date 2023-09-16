@@ -37,25 +37,44 @@
         style="@style/buttonRow">
 
         <Button
-            style="@style/buttonNumber"
             android:id="@+id/button1"
-            android:text="1"/>
-        <Button
             style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="1"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button2"
-            android:text="2"/>
-        <Button
             style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="2"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button3"
-            android:text="3" />
+            style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="3"
+            app:cornerRadius="20dp" />
+
         <Button
-            style="@style/buttonOperator"
             android:id="@+id/button4"
-            android:text="+"/>
-        <Button
             style="@style/buttonOperator"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="+"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button5"
-            android:text="*" />
+            style="@style/buttonOperator"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="*"
+            app:cornerRadius="20dp" />
 
     </LinearLayout>
 
@@ -63,25 +82,44 @@
         style="@style/buttonRow">
 
         <Button
-            style="@style/buttonNumber"
             android:id="@+id/button6"
-            android:text="4"/>
-        <Button
             style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="4"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button7"
-            android:text="5"/>
-        <Button
             style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="5"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button8"
-            android:text="6" />
+            style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="6"
+            app:cornerRadius="20dp" />
+
         <Button
-            style="@style/buttonOperator"
             android:id="@+id/button9"
-            android:text="-"/>
-        <Button
             style="@style/buttonOperator"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="-"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button10"
-            android:text="/" />
+            style="@style/buttonOperator"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="/"
+            app:cornerRadius="20dp" />
 
     </LinearLayout>
 
@@ -89,22 +127,37 @@
         style="@style/buttonRow">
 
         <Button
-            style="@style/buttonNumber"
             android:id="@+id/button11"
-            android:text="7"/>
-        <Button
             style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="7"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button12"
-            android:text="8"/>
-        <Button
             style="@style/buttonNumber"
-            android:id="@+id/button13"
-            android:text="9" />
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="8"
+            app:cornerRadius="20dp" />
+
         <Button
-            style="@style/buttonOperator"
+            android:id="@+id/button13"
+            style="@style/buttonNumber"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="9"
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button14"
+            style="@style/buttonOperator"
             android:layout_weight="2"
-            android:text="sqrt"/>
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="sqrt"
+            app:cornerRadius="20dp" />
 
     </LinearLayout>
 
@@ -112,20 +165,30 @@
         style="@style/buttonRow">
 
         <Button
-            style="@style/buttonNumber"
             android:id="@+id/button15"
+            style="@style/buttonNumber"
             android:layout_weight="2"
-            android:text="0"/>
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="0"
+            app:cornerRadius="20dp" />
+
         <Button
-            style="@style/buttonOperator"
             android:id="@+id/button16"
-            android:text="."/>
-        <Button
             style="@style/buttonOperator"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
+            android:text="."
+            app:cornerRadius="20dp" />
+
+        <Button
             android:id="@+id/button17"
+            style="@style/buttonOperator"
             android:layout_weight="2"
+            android:insetLeft="4dp"
+            android:insetRight="4dp"
             android:text="="
-            android:onClick="equalsAction" />
+            app:cornerRadius="20dp" />
 
     </LinearLayout>
 
