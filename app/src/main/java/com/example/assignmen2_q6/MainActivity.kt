@@ -23,8 +23,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    //private var numberInput: EditText = binding.workspace //this line crashes program
-
 
     private var canAddOperation = false
     private var canAddDecimal = true
@@ -32,18 +30,14 @@ class MainActivity : AppCompatActivity() {
     private var holdingSqrt = false
 
     //sourced from Java code found at https://stackoverflow.com/questions/3349121/how-do-i-use-inputfilter-to-limit-characters-in-an-edittext-in-android
-    private var decimalFilter:InputFilter = object : InputFilter {
-        override fun filter(
-            input: CharSequence, start: Int, end: Int,
-            dest: Spanned, dstart: Int, dend: Int
-        ): CharSequence {
-            return if (!canAddDecimal and input.contains('.')){
+    private var decimalFilter:InputFilter =
+        InputFilter { input, start, end, dest, dstart, dend ->
+            if (!canAddDecimal and input.contains('.')){
                 ""
             } else {
                 input
             }
         }
-    }
 
     //using text watcher to be 'smart' and avoid multiple decimals when inputting a number
     //from keyboard
@@ -52,8 +46,10 @@ class MainActivity : AppCompatActivity() {
     private val decimalLookout: TextWatcher = object : TextWatcher{
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-            if (s.last() == '.') {
-                canAddDecimal = false
+            if (s.isNotEmpty()){ //if s is empty, calling .last() crashes program
+                if (s.last() == '.') {
+                    canAddDecimal = false
+                }
             }
         }
         override fun afterTextChanged(s: Editable) {
@@ -68,7 +64,7 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.workspace.addTextChangedListener(decimalLookout) //not working as intended
+        binding.workspace.addTextChangedListener(decimalLookout)
         binding.workspace.filters = arrayOf(decimalFilter)
 
         binding.button1.setOnClickListener { numberAction(it) }
