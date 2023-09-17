@@ -218,25 +218,47 @@ class MainActivity : AppCompatActivity() {
         return passedList
     }
 
-    private fun addSubtractCalculate(passedList: MutableList<Any>): Float
+    private fun addSubtractCalculate(passedList: MutableList<Any>): Double
     {
-        Log.d("debug","addSubtractCalculate, before cast")
-        Log.d("debug","casting ${passedList[0]} as float")
-        var result = passedList[0].toString().toFloat()
-        Log.d("debug","addSubtractCalculate, result: $result")
+        Log.d("debug","begin addSubtractCalculate")
+        Log.d("debug","processing list:")
+        passedList.forEach { item -> Log.d("debug", " ${ item.toString() } : ${ item::class.java.toString() }") }
+
+        var result = 0.0
+        var operator = '+'
         for(i in passedList.indices)
+        // assuming the input follows a pattern of alternation between numbers and symbols
+        // theoretically speaking, number sequences would result in a summation and
+        // consecutive operations would result in the last operation overwriting previous ones
         {
-            if(passedList[i] is Char && i != passedList.lastIndex)
+            if(passedList[i].toString().toDoubleOrNull() != null)
+            // doing calculation immediately when encounters a number
             {
-                val operator = passedList[i]
-                val nextDigit = passedList[i + 1] as Float
-                if (operator == '+')
-                    result += nextDigit
-                if (operator == '-')
-                    result -= nextDigit
+                when(operator)
+                {
+                    '+' ->
+                    {
+                        result += passedList[i].toString().toDouble()
+                    }
+                    '-' ->
+                    {
+                        result -= passedList[i].toString().toDouble()
+                        // default plus operation
+                        operator = '+'
+                    }
+                }
+            }
+            else
+            // update the next operation
+            {
+                operator = when(passedList[i].toString()) {
+                    "+" -> '+'
+                    "-" -> '-'
+                    else -> error("Unrecognized operator: ${passedList[i]}")
+                    // TODO: Implement an error class?
+                }
             }
         }
-
         return result
     }
 
