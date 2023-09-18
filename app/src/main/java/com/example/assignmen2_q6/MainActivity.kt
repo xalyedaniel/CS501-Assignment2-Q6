@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.Toast
 import com.example.assignmen2_q6.databinding.ActivityMainBinding
 import kotlin.math.sqrt
 
@@ -68,11 +69,39 @@ class MainActivity : AppCompatActivity() {
         val digitsOperators = digitsOperators()
         if(digitsOperators.isEmpty()) return ""
 
-        val timesDivision = timesDivisionCalculate(digitsOperators)
+        val sqrt = sqrtCalculate(digitsOperators)
+        if(sqrt.isEmpty()) return ""
+
+        val timesDivision = timesDivisionCalculate(sqrt)
         if(timesDivision.isEmpty()) return ""
 
         val result = addSubtractCalculate(timesDivision)
         return result.toString()
+    }
+
+    private fun sqrtCalculate(passedList: MutableList<Any>): MutableList<Any> {
+        /*
+        check previous value if it exists and return square root of previous value
+         */
+        var result = passedList
+
+        while (result.contains("sqrt")) {
+            val index = result.indexOf("sqrt")
+            val next = result[index + 1].toString().toFloat()
+            if (next >= 0) {
+                result =
+                    (result.slice(0..<index - 1) + mutableListOf(sqrt(next)) + result.slice(index + 1..<result.size)).toMutableList()
+            } else {
+                Toast.makeText(
+                    getApplicationContext(),
+                    "error: negative input to square root",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            //Toast.makeText(getApplicationContext(), result.toString(), Toast.LENGTH_SHORT).show()
+
+        }
+        return result
     }
 
     private fun addSubtractCalculate(passedList: MutableList<Any>): Float
