@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import com.example.assignmen2_q6.databinding.ActivityMainBinding
 import kotlin.math.sqrt
+import android.widget.Toast
 
 
 class MainActivity : AppCompatActivity() {
@@ -62,14 +63,21 @@ class MainActivity : AppCompatActivity() {
         }
         else if(view is Button && canAddSqrt){
             binding.workspace.append(view.text)
+            canAddOperation = false
             canAddSqrt = false
             canAddDecimal = true
         }
     }
 
     fun equalsAction(view: View) {
-        binding.workspace.text = calculateResults()
+        val result = calculateResults()
+        if (result.isNotEmpty()) {
+            binding.workspace.text = result
+        } else {
+            showToast("Error: Invalid expression")
+        }
     }
+
 
     private fun calculateResults(): String
     {
@@ -106,7 +114,7 @@ class MainActivity : AppCompatActivity() {
     private fun timesDivisionCalculate(passedList: MutableList<Any>): MutableList<Any>
     {
         var list = passedList
-        while (list.contains('x') || list.contains('/'))
+        while (list.contains('x') || list.contains('/')|| list.contains("sqrt"))
         {
             list = calcTimesDiv(list)
         }
@@ -120,7 +128,7 @@ class MainActivity : AppCompatActivity() {
 
         for(i in passedList.indices)
         {
-            if((passedList[i] is Char || passedList[i] =="sqrt") && i != passedList.lastIndex && i < restartIndex)
+            if((passedList[i] == '*' || passedList[i] == '/' || passedList[i] =="sqrt") && i != passedList.lastIndex && i < restartIndex)
             {
                 val operator = passedList[i]
                 val prevDigit = passedList[i - 1] as Float
@@ -134,13 +142,17 @@ class MainActivity : AppCompatActivity() {
                     }
                     '/' ->
                     {
-                        newList.add(prevDigit / nextDigit)
-                        restartIndex = i + 1
+                        if(nextDigit.toInt() == 0){
+                            showToast("Error: Invalid input")
+                        }
+                        else{
+                            newList.add(prevDigit / nextDigit)
+                            restartIndex = i + 1
+                        }
                     }
                     "sqrt" ->
                     {
-                        //not done yet
-                        newList.add(sqrt(prevDigit))
+                        newList.add(sqrt(nextDigit))
                         restartIndex = i + 1
                     }
                     else ->
@@ -178,6 +190,11 @@ class MainActivity : AppCompatActivity() {
             list.add(currentDigit.toFloat())
 
         return list
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        binding.workspace.text = ""
     }
 
 }
