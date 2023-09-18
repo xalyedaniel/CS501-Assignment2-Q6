@@ -2,6 +2,7 @@ package com.example.assignmen2_q6
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import com.example.assignmen2_q6.databinding.ActivityMainBinding
@@ -12,9 +13,10 @@ import android.widget.Toast
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private var canAddNumber = true
     private var canAddOperation = false
-    private var canAddDecimal = true
-    private var canAddSqrt = true
+    private var canAddDecimal = true //accepting pattern "\.\d+"
+    private var canAddSqrt = false //enter number first
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,30 +44,72 @@ class MainActivity : AppCompatActivity() {
 
     private fun numberAction(view: View){
         if (view is Button){
+            // . pressed
             if (view.text == "."){
-                if (canAddDecimal)
+                if (canAddDecimal) {
                     binding.workspace.append(view.text)
-                canAddDecimal = false
-            } else {
-                binding.workspace.append(view.text)
+                    canAddDecimal = false
+                    canAddNumber = true
+                    canAddOperation = false
+                    canAddSqrt = false
+                }
             }
-            canAddOperation = true
-            canAddSqrt = false
+            // number pressed
+            else {
+                if (canAddNumber) {
+                    binding.workspace.append(view.text)
+                    canAddDecimal = canAddDecimal
+                    canAddNumber = true
+                    canAddOperation = true
+                    canAddSqrt = true
+                }
+            }
         }
     }
 
     private fun operationAction(view: View) {
-        if(view is Button && canAddOperation) {
-            binding.workspace.append(view.text)
-            canAddOperation = false
-            canAddDecimal = true
-            canAddSqrt = true
-        }
-        else if(view is Button && canAddSqrt){
-            binding.workspace.append(view.text)
-            canAddOperation = false
-            canAddSqrt = false
-            canAddDecimal = true
+//        if(view is Button && canAddOperation) {
+//            binding.workspace.append(view.text)
+//            canAddOperation = false
+//            canAddDecimal = true
+//            canAddSqrt = true
+//        }
+//        else if(view is Button && canAddSqrt){
+//            binding.workspace.append(view.text)
+//            canAddOperation = false
+//            canAddSqrt = false
+//            canAddDecimal = true
+//        }
+        Log.d("debug","$canAddSqrt, $view")
+
+        if(view is Button) {
+            if (view.text == "sqrt"){
+                if (canAddSqrt){
+                    // https://www.baeldung.com/kotlin/regular-expressions#replacing
+                    // https://regexr.com/
+                    val regex = """((sqrt)*\d+(\.\d+)?)${'$'}""".toRegex()
+                    val beforeReplace = binding.workspace.text.toString()
+                    Log.d("debug","$beforeReplace")
+                    val addSqrtToLastNumber = regex.replace(beforeReplace){
+                        m -> "sqrt"+ m.value
+                    }
+                    Log.d("debug","$addSqrtToLastNumber")
+
+                    binding.workspace.text = addSqrtToLastNumber
+                    canAddDecimal = false
+                    canAddNumber = false
+                    canAddOperation = true
+                    canAddSqrt = true
+                }
+            }
+            else if (canAddOperation){
+                // TODO: override last operator
+                binding.workspace.append(view.text)
+                canAddDecimal = true
+                canAddNumber = true
+                canAddOperation = true
+                canAddSqrt = false
+            }
         }
     }
 
@@ -91,16 +135,16 @@ class MainActivity : AppCompatActivity() {
         return result.toString()
     }
 
-    private fun addSubtractCalculate(passedList: MutableList<Any>): Float
+    private fun addSubtractCalculate(passedList: MutableList<Any>): Double
     {
-        var result = passedList[0] as Float
+        var result = passedList[0] as Double
 
         for(i in passedList.indices)
         {
             if(passedList[i] is Char && i != passedList.lastIndex)
             {
                 val operator = passedList[i]
-                val nextDigit = passedList[i + 1] as Float
+                val nextDigit = passedList[i + 1] as Double
                 if (operator == '+')
                     result += nextDigit
                 if (operator == '-')
@@ -131,8 +175,8 @@ class MainActivity : AppCompatActivity() {
             if((passedList[i] == '*' || passedList[i] == '/' || passedList[i] =="sqrt") && i != passedList.lastIndex && i < restartIndex)
             {
                 val operator = passedList[i]
-                val prevDigit = passedList[i - 1] as Float
-                val nextDigit = passedList[i + 1] as Float
+                val prevDigit = passedList[i - 1] as Double
+                val nextDigit = passedList[i + 1] as Double
                 when(operator)
                 {
                     '*' ->
@@ -170,24 +214,46 @@ class MainActivity : AppCompatActivity() {
         return newList
     }
 
+    private fun parseSqrt(string: String): Double{
+        if (string.toDoubleOrNull() != null){
+            return string.toDouble()
+        }
+        else{
+            return sqrt(parseSqrt(string.drop(4)))
+        }
+    }
+
+    private fun isOperater(char: Char): Boolean{
+        return char in "+-*/"
+    }
+
     private fun digitsOperators(): MutableList<Any>
     {
         val list = mutableListOf<Any>()
         var currentDigit = ""
+        var parsingSqrt = false
         for(character in binding.workspace.text)
         {
             if(character.isDigit() || character == '.')
                 currentDigit += character
-            else
-            {
-                list.add(currentDigit.toFloat())
+            else if (!isOperater(character)){
+                currentDigit += character
+                parsingSqrt = true
+            }
+            else if (isOperater(character)){
+                if (parsingSqrt)
+                    list.add(parseSqrt(currentDigit))
+                list.add(currentDigit.toDouble())
                 currentDigit = ""
                 list.add(character)
             }
         }
 
         if(currentDigit != "")
-            list.add(currentDigit.toFloat())
+            if (parsingSqrt)
+                list.add(parseSqrt(currentDigit))
+            else
+                list.add(currentDigit.toDouble())
 
         return list
     }
