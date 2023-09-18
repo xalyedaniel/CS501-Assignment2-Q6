@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 
+
+<!-- this needs to be an EditText but changing things here breaks other functions in main_activity -->
+<!-- must change later on -->
+
+
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -9,6 +14,8 @@
     android:layout_weight="2"
     android:padding="20dp"
     tools:context=".MainActivity">
+
+
 
     <TextView
         android:id="@+id/workspace"
@@ -29,8 +36,7 @@
         style="@style/buttonNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="164dp"
-        android:layout_marginTop="8dp"
+
         android:text="1"
         app:layout_constraintLeft_toLeftOf="@id/workspace"
         app:layout_constraintTop_toBottomOf="@id/workspace" />
@@ -40,7 +46,7 @@
         style="@style/buttonNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="92dp"
+
         android:text="2"
         app:layout_constraintLeft_toRightOf="@id/button1"
         app:layout_constraintTop_toBottomOf="@id/workspace" />
@@ -75,90 +81,114 @@
     <Button
         style="@style/buttonNumber"
         android:id="@+id/button6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="4"
         app:layout_constraintTop_toBottomOf="@id/button1"
-        app:layout_contraintRight_toLeftOf="@id/button2"/>
+        app:layout_constraintRight_toLeftOf="@id/button2"/>
     <Button
         style="@style/buttonNumber"
         android:id="@+id/button7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="5"
         app:layout_constraintTop_toBottomOf="@id/button1"
-        app:layout_contraintLeft_toRightOf="@id/button6"/>
+        app:layout_constraintLeft_toRightOf="@id/button6"/>
     <Button
         style="@style/buttonNumber"
         android:id="@+id/button8"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="6"
         app:layout_constraintTop_toBottomOf="@id/button1"
-        app:layout_contraintLeft_toRightOf="@id/button7"/>
+        app:layout_constraintLeft_toRightOf="@id/button7"/>
     <Button
         style="@style/buttonOperator"
         android:id="@+id/button9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="-"
         app:layout_constraintTop_toBottomOf="@id/button1"
-        app:layout_contraintLeft_toRightOf="@id/button8"/>
+        app:layout_constraintLeft_toRightOf="@id/button8"/>
     <Button
         style="@style/buttonOperator"
         android:id="@+id/button10"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="/"
         app:layout_constraintTop_toBottomOf="@id/button1"
-        app:layout_contraintLeft_toRightOf="@id/button9"/>
+        app:layout_constraintLeft_toRightOf="@id/button9"/>
 
 
     <Button
         android:id="@+id/button11"
         style="@style/buttonNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="7"
         app:layout_constraintTop_toBottomOf="@id/button7"
-        app:layout_contraintRight_toLeftOf="@id/button7"
+        app:layout_constraintRight_toLeftOf="@id/button7"
         />
 
     <Button
         android:id="@+id/button12"
         style="@style/buttonNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="8"
         app:layout_constraintTop_toBottomOf="@id/button7"
-        app:layout_contraintLeft_toRightOf="@id/button11"
+        app:layout_constraintLeft_toRightOf="@id/button11"
         />
 
     <Button
         android:id="@+id/button13"
         style="@style/buttonNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="9"
         app:layout_constraintTop_toBottomOf="@id/button7"
-        app:layout_contraintLeft_toRightOf="@id/button12"
+        app:layout_constraintLeft_toRightOf="@id/button12"
         />
 
     <Button
         android:id="@+id/button14"
         style="@style/buttonOperator"
         android:layout_weight="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="sqrt"
         app:layout_constraintTop_toBottomOf="@id/button7"
-        app:layout_contraintLeft_toRightOf="@id/button13"
+        app:layout_constraintLeft_toRightOf="@id/button13"
          />
 
     <Button
         style="@style/buttonNumber"
         android:id="@+id/button15"
         android:layout_weight="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="0"
         app:layout_constraintTop_toBottomOf="@id/button11"
-        app:layout_contraintRight_toLeftOf="@id/button11"/>
+        app:layout_constraintRight_toLeftOf="@id/button11"/>
     <Button
         style="@style/buttonOperator"
         android:id="@+id/button16"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="."
         app:layout_constraintTop_toBottomOf="@id/button11"
-        app:layout_contraintLeft_toRightOf="@id/button15"
+        app:layout_constraintLeft_toRightOf="@id/button15"
         />
     <Button
         style="@style/buttonOperator"
         android:id="@+id/button17"
         android:layout_weight="2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:text="="
         android:onClick="equalsAction"
         app:layout_constraintTop_toBottomOf="@id/button11"
-        app:layout_contraintLeft_toRightOf="@id/button16"/>
+        app:layout_constraintLeft_toRightOf="@id/button16"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
