@@ -13,6 +13,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private var canAddOperation = false
     private var canAddDecimal = true
+    private var canAddSqrt = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +49,7 @@ class MainActivity : AppCompatActivity() {
                 binding.workspace.append(view.text)
             }
             canAddOperation = true
+            canAddSqrt = false
         }
     }
 
@@ -55,6 +57,12 @@ class MainActivity : AppCompatActivity() {
         if(view is Button && canAddOperation) {
             binding.workspace.append(view.text)
             canAddOperation = false
+            canAddDecimal = true
+            canAddSqrt = true
+        }
+        else if(view is Button && canAddSqrt){
+            binding.workspace.append(view.text)
+            canAddSqrt = false
             canAddDecimal = true
         }
     }
@@ -132,6 +140,7 @@ class MainActivity : AppCompatActivity() {
                     "sqrt" ->
                     {
                         //not done yet
+                        newList.add(sqrt(prevDigit))
                         restartIndex = i + 1
                     }
                     else ->
