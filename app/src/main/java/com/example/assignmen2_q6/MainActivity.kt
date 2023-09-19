@@ -67,8 +67,8 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun endsWithin(string: CharSequence, charSequence: CharSequence): Boolean {
-        return charSequence.any { c: Char -> string.endsWith(c) }
+    private fun endsWithOperator(string: CharSequence): Boolean {
+        return isOperater(string.last())
     }
 
     private fun operationAction(view: View) {
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 //            canAddSqrt = false
 //            canAddDecimal = true
 //        }
-        Log.d("debug","$canAddSqrt, $view")
+        Log.d("operationAction","$canAddSqrt, $view")
 
         if(view is Button) {
             if (view.text == "sqrt"){
@@ -93,11 +93,11 @@ class MainActivity : AppCompatActivity() {
                     // https://regexr.com/
                     val regex = """((sqrt)*\d+(\.\d+)?)${'$'}""".toRegex()
                     val beforeReplace = binding.workspace.text.toString()
-                    Log.d("debug","$beforeReplace")
+                    Log.d("sqrt","$beforeReplace")
                     val addSqrtToLastNumber = regex.replace(beforeReplace){
                         m -> "sqrt"+ m.value
                     }
-                    Log.d("debug","$addSqrtToLastNumber")
+                    Log.d("sqrt","$addSqrtToLastNumber")
 
                     binding.workspace.setText(addSqrtToLastNumber)
                     canAddDecimal = false
@@ -107,8 +107,14 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             else if (canAddOperation){
-                // TODO: override last operator
+                var workspaceText = binding.workspace.text.toString()
+                Log.d("+-*/",workspaceText)
+                if (endsWithOperator(workspaceText)){
+                    binding.workspace.setText(workspaceText.dropLast(1))
+                    Log.d("+-*/",binding.workspace.text.toString())
+                }
                 binding.workspace.append(view.text)
+                // TODO: cursor jumping to the beginning
                 canAddDecimal = true
                 canAddNumber = true
                 canAddOperation = true
