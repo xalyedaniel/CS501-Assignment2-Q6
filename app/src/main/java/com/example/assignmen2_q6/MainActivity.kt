@@ -67,6 +67,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun endsWithin(string: CharSequence, charSequence: CharSequence): Boolean {
+        return charSequence.any { c: Char -> string.endsWith(c) }
+    }
+
     private fun operationAction(view: View) {
 //        if(view is Button && canAddOperation) {
 //            binding.workspace.append(view.text)
@@ -95,7 +99,7 @@ class MainActivity : AppCompatActivity() {
                     }
                     Log.d("debug","$addSqrtToLastNumber")
 
-                    binding.workspace.text = addSqrtToLastNumber
+                    binding.workspace.setText(addSqrtToLastNumber)
                     canAddDecimal = false
                     canAddNumber = false
                     canAddOperation = true
@@ -116,7 +120,7 @@ class MainActivity : AppCompatActivity() {
     fun equalsAction(view: View) {
         val result = calculateResults()
         if (result.isNotEmpty()) {
-            binding.workspace.text = result
+            binding.workspace.setText(result)
         } else {
             showToast("Error: Invalid expression")
         }
@@ -127,6 +131,9 @@ class MainActivity : AppCompatActivity() {
     {
         val digitsOperators = digitsOperators()
         if(digitsOperators.isEmpty()) return ""
+
+//        val sqrt = sqrtCalculate(digitsOperators)
+//        if (sqrt.isEmpty()) return ""
 
         val timesDivision = timesDivisionCalculate(digitsOperators)
         if(timesDivision.isEmpty()) return ""
@@ -260,7 +267,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        binding.workspace.text = ""
+        binding.workspace.setText("")
     }
 
 }
