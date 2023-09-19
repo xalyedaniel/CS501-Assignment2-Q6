@@ -241,6 +241,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun digitsOperators(): MutableList<Any>
+    // TODO: handle malformed input
     {
         val list = mutableListOf<Any>()
         var currentDigit = ""
@@ -256,7 +257,8 @@ class MainActivity : AppCompatActivity() {
             else if (isOperater(character)){
                 if (parsingSqrt)
                     list.add(parseSqrt(currentDigit))
-                list.add(currentDigit.toDouble())
+                else
+                    list.add(currentDigit.toDouble())
                 currentDigit = ""
                 list.add(character)
             }
@@ -267,7 +269,12 @@ class MainActivity : AppCompatActivity() {
                 list.add(parseSqrt(currentDigit))
             else
                 list.add(currentDigit.toDouble())
+        list.forEach { item -> Log.d("expression element",item.toString()) }
+        return list
+    }
 
+    private fun parseExpression(): MutableList<String>{
+        val list = mutableListOf<String>()
         return list
     }
 
