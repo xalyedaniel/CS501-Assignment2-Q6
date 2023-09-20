@@ -18,6 +18,7 @@
         <EditText
             android:id="@+id/workspace"
             android:layout_width="match_parent"
+            android:digits="0123456789*/+-.sqrt"
             android:layout_height="250dp"
             android:lines="2"
             android:maxLines="2"

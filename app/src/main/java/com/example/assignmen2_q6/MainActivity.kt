@@ -72,6 +72,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // https://kotlinlang.org/docs/extensions.html#extension-functions
     private fun String.endsWithOperator(): Boolean {
         // this string can be empty after user keyboard edit
         if (this.isEmpty())
@@ -137,7 +138,7 @@ class MainActivity : AppCompatActivity() {
         if (result.isNotEmpty()) {
             binding.workspace.setText(result)
         } else {
-            showToast("Error: Invalid expression")
+            showToast("Error: Empty expression")
         }
     }
 
@@ -222,6 +223,7 @@ class MainActivity : AppCompatActivity() {
         return list
     }
 
+    //https://www.youtube.com/watch?v=2hSHgungOKI
     private fun calcTimesDiv(passedList: MutableList<Any>): MutableList<Any>
     {
         val newList = mutableListOf<Any>()
@@ -284,6 +286,7 @@ class MainActivity : AppCompatActivity() {
         return char in "+-*/"
     }
 
+    //https://www.youtube.com/watch?v=2hSHgungOKI
     private fun digitsOperators(): MutableList<Any>
     // TODO: handle malformed input
     {
@@ -325,8 +328,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkSqrtIsComplete(string: String) {
-        // TODO: integrate with sqrt filter in Tianyi_branch
-        if (false)
+        if ("sqrt".any { string.contains(it) } and !string.contains("sqrt"))
             showToast("Error: Incomplete sqrt in $string")
     }
 
