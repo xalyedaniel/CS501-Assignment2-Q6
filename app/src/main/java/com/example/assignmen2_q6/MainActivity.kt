@@ -13,10 +13,16 @@ import android.widget.Toast
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    // TODO: update state after user text input
+    // TODO: move cursor to right after button pressed
     private var canAddNumber = true
     private var canAddOperation = false
     private var canAddDecimal = true //accepting pattern "\.\d+"
     private var canAddSqrt = false //enter number first
+    private val validFormat = """((sqrt)*\d+(\.\d+)?)|[+\-*/]""".toRegex()
+    private val validNumberFormat = """((sqrt)*\d+(\.\d+)?)""".toRegex()
+    private var stopExecution = false // user can edit the expression if there is an error
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +45,6 @@ class MainActivity : AppCompatActivity() {
         binding.button15.setOnClickListener { numberAction(it) }
         binding.button16.setOnClickListener { numberAction(it) }
         binding.button17.setOnClickListener { equalsAction(it) }
-
     }
 
     private fun numberAction(view: View){
@@ -67,11 +72,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun endsWithOperator(string: CharSequence): Boolean {
-        return isOperater(string.last())
+    private fun String.endsWithOperator(): Boolean {
+        // this string can be empty after user keyboard edit
+        if (this.isEmpty())
+            return false
+        return isOperator(this.last())
     }
 
     private fun operationAction(view: View) {
+        // TODO: operate directly on result
 //        if(view is Button && canAddOperation) {
 //            binding.workspace.append(view.text)
 //            canAddOperation = false
@@ -93,11 +102,11 @@ class MainActivity : AppCompatActivity() {
                     // https://regexr.com/
                     val regex = """((sqrt)*\d+(\.\d+)?)${'$'}""".toRegex()
                     val beforeReplace = binding.workspace.text.toString()
-                    Log.d("sqrt","$beforeReplace")
+                    Log.d("sqrt",beforeReplace)
                     val addSqrtToLastNumber = regex.replace(beforeReplace){
                         m -> "sqrt"+ m.value
                     }
-                    Log.d("sqrt","$addSqrtToLastNumber")
+                    Log.d("sqrt",addSqrtToLastNumber)
 
                     binding.workspace.setText(addSqrtToLastNumber)
                     canAddDecimal = false
@@ -107,9 +116,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             else if (canAddOperation){
-                var workspaceText = binding.workspace.text.toString()
+                val workspaceText = binding.workspace.text.toString()
                 Log.d("+-*/",workspaceText)
-                if (endsWithOperator(workspaceText)){
+                if (workspaceText.endsWithOperator()){
                     binding.workspace.setText(workspaceText.dropLast(1))
                     Log.d("+-*/",binding.workspace.text.toString())
                 }
@@ -132,24 +141,58 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
     private fun calculateResults(): String
     {
-        val digitsOperators = digitsOperators()
-        if(digitsOperators.isEmpty()) return ""
+//        val digitsOperators = digitsOperators()
+//        if(digitsOperators.isEmpty()) return ""
+
+        // result default to the expression it self
+        var result = binding.workspace.text.toString()
+
+        val expression = parseExpression()
+        expression.checksItIsGoodExpression()
 
 //        val sqrt = sqrtCalculate(digitsOperators)
 //        if (sqrt.isEmpty()) return ""
 
-        val timesDivision = timesDivisionCalculate(digitsOperators)
-        if(timesDivision.isEmpty()) return ""
+        // initializing outside condition
+        var sqrtResolved = mutableListOf<Any>()
+        // if there is error in previous step, stop execution
+        if (!stopExecution) {
+            sqrtResolved = resolveSqrt(expression)
+            if (sqrtResolved.isEmpty()) return ""
+        }
 
-        val result = addSubtractCalculate(timesDivision)
-        return result.toString()
+        // same logic
+        var timesDivision = mutableListOf<Any>()
+        if (!stopExecution) {
+            timesDivision = timesDivisionCalculate(sqrtResolved)
+            if(timesDivision.isEmpty()) return ""
+        }
+
+        if (!stopExecution) {
+            result = addSubtractCalculate(timesDivision)
+        }
+
+        // giving user second or more chance
+        if (stopExecution)
+            return binding.workspace.text.toString()
+        return result
     }
 
-    private fun addSubtractCalculate(passedList: MutableList<Any>): Double
+    private fun resolveSqrt(expression: MutableList<Any>): MutableList<Any> {
+        // returns a list that the elements are either char or Double
+        Log.d("resolve sqrt", "error before $stopExecution")
+        expression.forEach { Log.d("before sqrt",it.toString()+it::class.java.simpleName) }
+        // https://kotlinlang.org/docs/collection-transformations.html#map
+        val sqrtResolved: MutableList<Any> = expression.map { if (it is Char) it else parseSqrt(it.toString()) }.toMutableList()
+        sqrtResolved.forEach { Log.d("resolved sqrt",it.toString()+it::class.java.simpleName) }
+        return sqrtResolved
+    }
+
+    private fun addSubtractCalculate(passedList: MutableList<Any>): String
     {
+        Log.d("add sub", "error before $stopExecution")
         var result = passedList[0] as Double
 
         for(i in passedList.indices)
@@ -165,13 +208,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        return result
+        return result.toString()
     }
 
     private fun timesDivisionCalculate(passedList: MutableList<Any>): MutableList<Any>
     {
+        Log.d("mul div", "error before $stopExecution")
         var list = passedList
-        while (list.contains('x') || list.contains('/')|| list.contains("sqrt"))
+        while (list.contains('*') || list.contains('/')|| list.contains("sqrt"))
         {
             list = calcTimesDiv(list)
         }
@@ -200,7 +244,7 @@ class MainActivity : AppCompatActivity() {
                     '/' ->
                     {
                         if(nextDigit.toInt() == 0){
-                            showToast("Error: Invalid input")
+                            showToast("Error: Division by zero")
                         }
                         else{
                             newList.add(prevDigit / nextDigit)
@@ -236,7 +280,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun isOperater(char: Char): Boolean{
+    private fun isOperator(char: Char): Boolean{
         return char in "+-*/"
     }
 
@@ -250,11 +294,11 @@ class MainActivity : AppCompatActivity() {
         {
             if(character.isDigit() || character == '.')
                 currentDigit += character
-            else if (!isOperater(character)){
+            else if (!isOperator(character)){
                 currentDigit += character
                 parsingSqrt = true
             }
-            else if (isOperater(character)){
+            else if (isOperator(character)){
                 if (parsingSqrt)
                     list.add(parseSqrt(currentDigit))
                 else
@@ -273,14 +317,72 @@ class MainActivity : AppCompatActivity() {
         return list
     }
 
-    private fun parseExpression(): MutableList<String>{
-        val list = mutableListOf<String>()
-        return list
+
+    private fun checkMultipleDot(string: String) {
+        // https://www.baeldung.com/kotlin/string-character-count-occurrences#using-count
+        if (string.count { it == '.' } > 1)
+            showToast("Error: Multiple decimal")
+    }
+
+    private fun checkSqrtIsComplete(string: String) {
+        // TODO: integrate with sqrt filter in Tianyi_branch
+        if (false)
+            showToast("Error: Incomplete sqrt in $string")
+    }
+
+    private fun checkFormat(string: String){
+        if (!validFormat.matches(string))
+            showToast("Error: Invalid input $string")
+    }
+
+    private fun Any.checksItFitsInExpression(){
+        checkMultipleDot(this.toString())
+        checkSqrtIsComplete(this.toString())
+        checkFormat(this.toString())
+    }
+
+    private fun MutableList<Any>.checkBeginsWithNumber(): MutableList<Any> {
+        if (!validNumberFormat.matches(this[0].toString()))
+            showToast("Error: Expression should begin with a number")
+        return this
+    }
+
+    private fun MutableList<Any>.checkEndsWithNumber(): MutableList<Any> {
+        if (!validNumberFormat.matches(this.last().toString()))
+            showToast("Error: Expression should end with a number")
+        return this
+    }
+
+    private fun MutableList<Any>.checksItIsGoodExpression(){
+        this
+            .checkBeginsWithNumber()
+            .checkEndsWithNumber()
+        this.forEach { it.checksItFitsInExpression() }
+    }
+
+    // parse expression into operator and operands
+    private fun parseExpression(): MutableList<Any>{
+        val expressionList = mutableListOf<Any>()
+        val expressionString = binding.workspace.text.toString()
+        var operand = ""
+        for (char in expressionString){
+            if (isOperator(char)){
+                expressionList.add(operand)
+                expressionList.add(char)
+                operand=""
+            }else{
+                operand+=char
+            }
+        }
+        // add last number to expression
+        expressionList.add(operand)
+        return expressionList
     }
 
     private fun showToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        binding.workspace.setText("")
+        stopExecution = true
+//        binding.workspace.setText("")
     }
 
 }
