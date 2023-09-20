@@ -269,7 +269,8 @@ class MainActivity : AppCompatActivity() {
             if(i > restartIndex)
                 newList.add(passedList[i])
         }
-
+        // TODO: found error: a+b*c=b*c
+        newList.forEach { Log.d("mul div",it.toString()) }
         return newList
     }
 
