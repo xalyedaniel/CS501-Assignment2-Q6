@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private val validFormat = """((sqrt)*\d+(\.\d+)?)|[+\-*/]""".toRegex()
     private val validNumberFormat = """((sqrt)*\d+(\.\d+)?)""".toRegex()
     private var stopExecution = false // user can edit the expression if there is an error
+    private var displayingResult = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +50,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun numberAction(view: View){
         if (view is Button){
+            if (displayingResult) binding.workspace.text.clear()
+            displayingResult = false
             // . pressed
             if (view.text == "."){
                 if (canAddDecimal) {
@@ -81,7 +84,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun operationAction(view: View) {
-        // TODO: operate directly on result
 //        if(view is Button && canAddOperation) {
 //            binding.workspace.append(view.text)
 //            canAddOperation = false
@@ -94,9 +96,9 @@ class MainActivity : AppCompatActivity() {
 //            canAddSqrt = false
 //            canAddDecimal = true
 //        }
-        Log.d("operationAction","$canAddSqrt, $view")
-
         if(view is Button) {
+            Log.d("operationAction","${view.text}")
+            displayingResult = false
             if (view.text == "sqrt"){
                 if (canAddSqrt){
                     // https://www.baeldung.com/kotlin/regular-expressions#replacing
@@ -138,6 +140,7 @@ class MainActivity : AppCompatActivity() {
         val result = calculateResults()
         if (result.isNotEmpty()) {
             binding.workspace.setText(result)
+            if (!stopExecution) displayingResult = true
         } else {
             showToast("Error: Empty expression")
         }
@@ -327,7 +330,6 @@ class MainActivity : AppCompatActivity() {
 
     //https://www.youtube.com/watch?v=2hSHgungOKI
     private fun digitsOperators(): MutableList<Any>
-    // TODO: handle malformed input
     {
         val list = mutableListOf<Any>()
         var currentDigit = ""
