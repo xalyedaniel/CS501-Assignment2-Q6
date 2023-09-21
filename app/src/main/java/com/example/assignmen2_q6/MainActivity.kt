@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // TODO: move cursor to right after button pressed
     // allowed actions
     private var canAddNumber = true
     private var canAddOperation = false
@@ -122,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                     canAddSqrt = true
                 }
             }
+            binding.workspace.setSelection(binding.workspace.length())
             changeTriggeredByButton = false
         }
     }
@@ -177,12 +177,12 @@ class MainActivity : AppCompatActivity() {
                     Log.d("+-*/",binding.workspace.text.toString())
                 }
                 binding.workspace.append(view.text)
-                // TODO: cursor jumping to the beginning
                 canAddDecimal = true
                 canAddNumber = true
                 canAddOperation = true
                 canAddSqrt = false
             }
+            binding.workspace.setSelection(binding.workspace.length())
             changeTriggeredByButton = false
         }
     }
@@ -198,6 +198,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 showToast("Error: Empty expression")
             }
+            binding.workspace.setSelection(binding.workspace.length())
             changeTriggeredByButton = true
         }
     }
@@ -385,6 +386,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //https://www.youtube.com/watch?v=2hSHgungOKI
+    @Deprecated("use parseExpression()")
     private fun digitsOperators(): MutableList<Any>
     {
         val list = mutableListOf<Any>()
