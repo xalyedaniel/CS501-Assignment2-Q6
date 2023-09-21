@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         // this string can be empty after user keyboard edit
         if (this.isEmpty())
             return false
-        return isOperator(this.last())
+        return this.last().isOperator()
     }
 
     private fun operationAction(view: View) {
@@ -134,6 +134,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun equalsAction(view: View) {
+        stopExecution = false
         val result = calculateResults()
         if (result.isNotEmpty()) {
             binding.workspace.setText(result)
@@ -215,15 +216,48 @@ class MainActivity : AppCompatActivity() {
     private fun timesDivisionCalculate(passedList: MutableList<Any>): MutableList<Any>
     {
         Log.d("mul div", "error before $stopExecution")
-        var list = passedList
-        while (list.contains('*') || list.contains('/')|| list.contains("sqrt"))
-        {
-            list = calcTimesDiv(list)
+        val mulDivResolved = mutableListOf<Any>()
+        var lastNumber = 1.0
+        var mulDivAccumulator = 1.0
+        var doingMul = false
+        var doingDiv = false
+        for (element in passedList){
+            if (element.toString().isOperator()){
+                when(val operator = element.toString().first()){
+                    '*' -> doingMul = true
+                    '/' -> doingDiv = true
+                    // operator is +-
+                    else -> {
+                        mulDivResolved.add(lastNumber)
+                        mulDivResolved.add(operator)
+                        doingMul = false
+                        doingDiv = false
+                    }
+                }
+            }
+            // element is number
+            else {
+                val number = element.toString().toDouble()
+                if (doingMul) lastNumber *= number
+                else if (doingDiv) {
+                    if (number == 0.0) showToast("Error: Division by zero")
+                    else lastNumber /= number
+                }
+                else lastNumber = number
+            }
         }
-        return list
+        mulDivResolved.add(lastNumber)
+//        var list = passedList
+//        while (list.contains('*') || list.contains('/')|| list.contains("sqrt"))
+//        {
+//            list = calcTimesDiv(list)
+//        }
+        mulDivResolved.forEach { Log.d("mul div",it.toString()+it::class.simpleName) }
+        return mulDivResolved
     }
 
     //https://www.youtube.com/watch?v=2hSHgungOKI
+    @Deprecated("use timesDivisionCalculate()")
     private fun calcTimesDiv(passedList: MutableList<Any>): MutableList<Any>
     {
         val newList = mutableListOf<Any>()
@@ -260,17 +294,17 @@ class MainActivity : AppCompatActivity() {
                     }
                     else ->
                     {
+                        Log.d("not*/",operator.toString())
                         newList.add(prevDigit)
                         newList.add(operator)
                     }
                 }
             }
-
+            // additions before multiplication is omitted
             if(i > restartIndex)
                 newList.add(passedList[i])
         }
-        // TODO: found error: a+b*c=b*c
-        newList.forEach { Log.d("mul div",it.toString()) }
+        newList.forEach { Log.d("mul div",it.toString()+it::class.simpleName) }
         return newList
     }
 
@@ -283,8 +317,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun isOperator(char: Char): Boolean{
-        return char in "+-*/"
+    private fun Char.isOperator(): Boolean{
+        return (this in "+-*/")
+    }
+
+    private fun String.isOperator(): Boolean{
+        return (this.length==1 && this.first().isOperator())
     }
 
     //https://www.youtube.com/watch?v=2hSHgungOKI
@@ -298,11 +336,11 @@ class MainActivity : AppCompatActivity() {
         {
             if(character.isDigit() || character == '.')
                 currentDigit += character
-            else if (!isOperator(character)){
+            else if (!character.isOperator()){
                 currentDigit += character
                 parsingSqrt = true
             }
-            else if (isOperator(character)){
+            else if (character.isOperator()){
                 if (parsingSqrt)
                     list.add(parseSqrt(currentDigit))
                 else
@@ -369,7 +407,7 @@ class MainActivity : AppCompatActivity() {
         val expressionString = binding.workspace.text.toString()
         var operand = ""
         for (char in expressionString){
-            if (isOperator(char)){
+            if (char.isOperator()){
                 expressionList.add(operand)
                 expressionList.add(char)
                 operand=""
