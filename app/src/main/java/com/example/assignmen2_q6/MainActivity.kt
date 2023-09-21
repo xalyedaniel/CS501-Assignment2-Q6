@@ -2,6 +2,8 @@ package com.example.assignmen2_q6
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.widget.Button
@@ -14,14 +16,19 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // TODO: update state after user text input
     // TODO: move cursor to right after button pressed
+    // allowed actions
     private var canAddNumber = true
     private var canAddOperation = false
     private var canAddDecimal = true //accepting pattern "\.\d+"
     private var canAddSqrt = false //enter number first
+
+    // expression formats
     private val validFormat = """((sqrt)*\d+(\.\d+)?)|[+\-*/]""".toRegex()
     private val validNumberFormat = """((sqrt)*\d+(\.\d+)?)""".toRegex()
+    private val validLastNumberFormat = """((sqrt)*\d+(\.\d+)?)${'$'}""".toRegex()
+
+    // calculator state
     private var stopExecution = false // user can edit the expression if there is an error
     private var displayingResult = false
 
@@ -29,6 +36,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        binding.workspace.addTextChangedListener(userUnpredictableActivityWatcher)
         binding.button1.setOnClickListener { numberAction(it) }
         binding.button2.setOnClickListener { numberAction(it) }
         binding.button3.setOnClickListener { numberAction(it) }
@@ -46,6 +54,44 @@ class MainActivity : AppCompatActivity() {
         binding.button15.setOnClickListener { numberAction(it) }
         binding.button16.setOnClickListener { numberAction(it) }
         binding.button17.setOnClickListener { equalsAction(it) }
+    }
+
+    // https://www.geeksforgeeks.org/how-to-implement-textwatcher-in-android/
+    private val userUnpredictableActivityWatcher: TextWatcher = object : TextWatcher {
+        override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+        override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
+        override fun afterTextChanged(s: Editable) {
+            displayingResult = false
+            // nothing fancy, just to update the allowed actions
+            val lastChar = s.last()
+            when{
+                lastChar.isOperator() -> {
+                    canAddDecimal = true
+                    canAddNumber = true
+                    canAddOperation = true
+                    canAddSqrt = false
+                }
+                lastChar == '.' -> {
+                    canAddDecimal = false
+                    canAddNumber = true
+                    canAddOperation = false
+                    canAddSqrt = false
+                }
+                lastChar.isDigit() -> {
+                    // any malformed input will be rejected during calculation
+                    // too many cases to be handled here whether canAddDecimal
+                    // mostly relating to sqrt
+                    // just checking the . count in the last term
+                    val lastOperand = """[+\-*/]?([sqrt.\d])+${'$'}""".toRegex()
+                    val matchResult = lastOperand.find(s.toString())
+                    canAddDecimal = matchResult?.value?.contains('.') == false
+                    canAddNumber = true
+                    canAddOperation = true
+                    canAddSqrt = true
+                    Log.d("canAddDecimal",canAddDecimal.toString())
+                }
+            }
+        }
     }
 
     private fun numberAction(view: View){
@@ -103,10 +149,9 @@ class MainActivity : AppCompatActivity() {
                 if (canAddSqrt){
                     // https://www.baeldung.com/kotlin/regular-expressions#replacing
                     // https://regexr.com/
-                    val regex = """((sqrt)*\d+(\.\d+)?)${'$'}""".toRegex()
                     val beforeReplace = binding.workspace.text.toString()
                     Log.d("sqrt",beforeReplace)
-                    val addSqrtToLastNumber = regex.replace(beforeReplace){
+                    val addSqrtToLastNumber = validLastNumberFormat.replace(beforeReplace){
                         m -> "sqrt"+ m.value
                     }
                     Log.d("sqrt",addSqrtToLastNumber)
