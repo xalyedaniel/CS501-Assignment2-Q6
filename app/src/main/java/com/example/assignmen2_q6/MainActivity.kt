@@ -61,37 +61,43 @@ class MainActivity : AppCompatActivity() {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
         override fun afterTextChanged(s: Editable) {
+
             if (!changeTriggeredByButton) {
                 displayingResult = false
                 // nothing fancy, just to update the allowed actions
-                val lastChar = s.last()
-                when{
-                    lastChar.isOperator() -> {
-                        canAddDecimal = true
-                        canAddNumber = true
-                        canAddOperation = true
-                        canAddSqrt = false
+                try{
+                    val lastChar = s.last()
+                    when{
+                        lastChar.isOperator() -> {
+                            canAddDecimal = true
+                            canAddNumber = true
+                            canAddOperation = true
+                            canAddSqrt = false
+                        }
+                        lastChar == '.' -> {
+                            canAddDecimal = false
+                            canAddNumber = true
+                            canAddOperation = false
+                            canAddSqrt = false
+                        }
+                        lastChar.isDigit() -> {
+                            // any malformed input will be rejected during calculation
+                            // too many cases to be handled here whether canAddDecimal
+                            // mostly relating to sqrt
+                            // just checking the . count in the last term
+                            val lastOperand = """[+\-*/]?([sqrt.\d])+${'$'}""".toRegex()
+                            val matchResult = lastOperand.find(s.toString())
+                            canAddDecimal = matchResult?.value?.contains('.') == false
+                            canAddNumber = true
+                            canAddOperation = true
+                            canAddSqrt = true
+                            Log.d("canAddDecimal",canAddDecimal.toString())
+                        }
                     }
-                    lastChar == '.' -> {
-                        canAddDecimal = false
-                        canAddNumber = true
-                        canAddOperation = false
-                        canAddSqrt = false
-                    }
-                    lastChar.isDigit() -> {
-                        // any malformed input will be rejected during calculation
-                        // too many cases to be handled here whether canAddDecimal
-                        // mostly relating to sqrt
-                        // just checking the . count in the last term
-                        val lastOperand = """[+\-*/]?([sqrt.\d])+${'$'}""".toRegex()
-                        val matchResult = lastOperand.find(s.toString())
-                        canAddDecimal = matchResult?.value?.contains('.') == false
-                        canAddNumber = true
-                        canAddOperation = true
-                        canAddSqrt = true
-                        Log.d("canAddDecimal",canAddDecimal.toString())
-                    }
+                } catch (e: Exception) {
+                    showToast("Error: Empty or invalid expression")
                 }
+
             }
         }
     }
